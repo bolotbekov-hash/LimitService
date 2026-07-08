@@ -17,9 +17,7 @@ import java.util.stream.Collectors;
 @RestControllerAdvice(basePackages = "bakaibank.PracticeWork2.controller")
 public class GlobalExceptionHandler {
 
-    // 1. Возвращаем перехватчик, но вместо "throw ex" мы возвращаем null!
-    // Это заставляет Spring Boot понять, что этот класс не хочет обрабатывать
-    // данную ошибку, и Spring передает управление стандартному механизму ресурсов.
+
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex) {
         return null;
@@ -35,7 +33,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-    // Красивая обработка ошибок валидации
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
         Map<String, Object> body = new HashMap<>();
@@ -58,10 +55,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
-    // Перехват бизнес-ошибок (RuntimeException из сервисов)
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
-        // Защита: если внутри RuntimeException спрятана системная ошибка Swagger, не трогаем её
         if (ex.getMessage() != null && ex.getMessage().contains("No static resource")) {
             return null;
         }
@@ -74,10 +69,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
-    // Ловит только РЕАЛЬНЫЕ общие ошибки сервера (500)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
-        // Проверяем, не пытается ли этот метод перехватить системные пути Swagger
         String message = ex.getMessage();
         if (message != null && (message.contains("api-docs") || message.contains("swagger"))) {
             return null;

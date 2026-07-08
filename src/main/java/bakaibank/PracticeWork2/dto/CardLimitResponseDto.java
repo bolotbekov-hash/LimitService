@@ -9,7 +9,7 @@ public class CardLimitResponseDto {
     private Long id;
     private Long cardId;
     private Long limitId;
-    private String limitTypeName; // Название лимита
+    private String limitTypeName;
     private BigDecimal currentSum;
     private Integer operationsCount;
     private LocalDateTime lastUpdatedAt;

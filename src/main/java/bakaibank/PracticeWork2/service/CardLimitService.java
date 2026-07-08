@@ -58,7 +58,7 @@ public class CardLimitService {
     @Transactional
     public CardLimitResponseDto updateCardLimit(Long cardLimitId, UpdateLimitRequestDto request){
         CardLimit cardLimit = cardLimitRepository.findById(cardLimitId)
-                .orElseThrow(() -> new RuntimeException("Лимит карты с ID " + cardLimitId + "е найден"));
+                .orElseThrow(() -> new RuntimeException("Лимит карты с ID " + cardLimitId + " не найден"));
         Card card = cardLimit.getCard();
 
         if(!"ACTIVE".equals(card.getStatus())){

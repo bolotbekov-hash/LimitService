@@ -28,7 +28,7 @@ class LimitControllerIT {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean // Используем актуальную аннотацию для Spring Boot 3.4
+    @MockitoBean
     private LimitService limitService;
 
     private Limit sampleLimit;
@@ -44,19 +44,17 @@ class LimitControllerIT {
         sampleLimit.setMaxOperationCount(10);
     }
 
-    // 1. ТЗ: Получение лимита (GET /api/v1/limits/active)
     @Test
     void getLimitsEndpointShouldReturnOk() throws Exception {
         when(limitService.getAllActiveLimits()).thenReturn(List.of(sampleLimit));
 
-        mockMvc.perform(get("/api/v1/limits/active"))
+        mockMvc.perform(get("/api/v1/limits/get/active"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].type").value("CASH"))
                 .andExpect(jsonPath("$[0].defaultSum").value(10000.00));
     }
 
-    // 2. ТЗ: Успешное изменение лимита (PUT /api/v1/limits/{id})
     @Test
     void updateLimitEndpointShouldReturnUpdatedLimit() throws Exception {
         Limit updatedLimit = new Limit();
@@ -74,14 +72,13 @@ class LimitControllerIT {
                 + "\"maxOperationCount\":10"
                 + "}";
 
-        mockMvc.perform(put("/api/v1/limits/1")
+        mockMvc.perform(put("/api/v1/limits/update/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.defaultSum").value(20000.00));
     }
 
-    // 3. ТЗ: Успешное создание лимита (POST /api/v1/limits)
     @Test
     void createLimitEndpointShouldReturnCreatedStatus() throws Exception {
         when(limitService.createLimit(any(Limit.class))).thenReturn(sampleLimit);
@@ -97,7 +94,7 @@ class LimitControllerIT {
         mockMvc.perform(post("/api/v1/limits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isCreated()) // Проверяет статус 201 Created
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.type").value("CASH"));
     }
 }
