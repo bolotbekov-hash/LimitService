@@ -14,4 +14,5 @@ public class CustomerDto {
     private Integer customerType;
     private String phoneNumber;
     private String inn;
+    private String email;
 }

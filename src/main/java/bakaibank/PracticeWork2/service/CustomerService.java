@@ -26,6 +26,7 @@ public class CustomerService {
                 .customerType(request.getCustomerType())
                 .phoneNumber(request.getPhoneNumber())
                 .inn(request.getInn())
+                .email(request.getEmail())
                 .createdAt(LocalDateTime.now())
                 .build();
         Customer savedCustomer = customerRepository.save(customer);
@@ -39,6 +40,7 @@ public class CustomerService {
         customer.setCustomerType(request.getCustomerType());
         customer.setPhoneNumber(request.getPhoneNumber());
         customer.setInn(request.getInn());
+        customer.setEmail(request.getEmail());
 
         Customer updateCustomer = customerRepository.save(customer);
         return customerMapper.toDto(updateCustomer);
@@ -53,7 +55,7 @@ public class CustomerService {
     @Transactional
     public CustomerDto getCustomerById(Long id){
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Клиент с ID " + "не найден"));
+                .orElseThrow(() -> new RuntimeException("Клиент с ID " + id +  " не найден"));
         return customerMapper.toDto(customer);
     }
 

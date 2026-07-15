@@ -2,29 +2,37 @@ package bakaibank.PracticeWork2.service;
 
 import bakaibank.PracticeWork2.dto.CardLimitResponseDto;
 import bakaibank.PracticeWork2.dto.CardRequestDto;
+import bakaibank.PracticeWork2.dto.NotificationEventDto;
 import bakaibank.PracticeWork2.dto.UpdateLimitRequestDto;
 import bakaibank.PracticeWork2.entity.Card;
 import bakaibank.PracticeWork2.entity.CardLimit;
+import bakaibank.PracticeWork2.entity.Customer;
 import bakaibank.PracticeWork2.entity.Limit;
 import bakaibank.PracticeWork2.mapper.CardLimitMapper;
+import bakaibank.PracticeWork2.mapper.CardMapper;
 import bakaibank.PracticeWork2.repository.CardLimitRepository;
 import bakaibank.PracticeWork2.repository.LimitRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CardLimitService {
     private final CardLimitRepository cardLimitRepository;
     private final CardLimitMapper cardLimitMapper;
+    private final CardMapper cardMapper;
     private final LimitService limitService;
     private final LimitHistoryService limitHistoryService;
+    private final RestTemplate restTemplate;
 
     @Transactional
     public void assignDefaultLimitsToCard(Card card){
@@ -97,6 +105,29 @@ public class CardLimitService {
                 newSum,
                 newOperationCount != null ? newOperationCount : currentOperations
         );
+
+        try {
+            Customer customer = card.getCustomer();
+
+            NotificationEventDto eventDto = NotificationEventDto.builder()
+                    .cardId(card.getId())
+                    .cardNumber(cardMapper.maskCardNumber(card.getCardNumber()))
+                    .clientId(customer != null ? customer.getId() : null)
+                    .limitType(cardLimit.getLimit() != null ? cardLimit.getLimit().getType() : "Операции")
+                    .oldLimit(oldSum)
+                    .newLimit(newSum)
+                    .changedAt(LocalDateTime.now())
+                    .clientEmail(customer != null ? customer.getEmail() : null)
+                    .build();
+
+            String notificationServiceUrl = "http://localhost:8081/api/notifications/events";
+
+            restTemplate.postForEntity(notificationServiceUrl, eventDto, Void.class);
+            log.info("Событие успешного изменения лимита отправлено в сервис уведомлений для карты ID: {}", card.getId());
+
+        } catch (Exception e) {
+            log.error("Не удалось отправить REST-уведомление в микросервис. Причина: {}", e.getMessage());
+        }
 
         return cardLimitMapper.toResponseDto(updatedCardLimit);
 

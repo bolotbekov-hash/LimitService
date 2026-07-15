@@ -14,7 +14,8 @@ public class CardMapper {
         if(card.getCustomer() != null){
             dto.setCustomerId(card.getCustomer().getId());
         }
-        dto.setCardNumber(card.getCardNumber());
+        dto.setCardNumber(maskCardNumber(card.getCardNumber()));
+
         dto.setAccountNumber(card.getAccountNumber());
         dto.setCardType(card.getCardType());
         dto.setStatus(card.getStatus());
@@ -24,4 +25,12 @@ public class CardMapper {
         return dto;
 
     }
+    public String maskCardNumber(String cardNumber) {
+        if (cardNumber == null || cardNumber.length() != 16) {
+            return cardNumber;
+        }
+        return cardNumber.substring(0, 4) + "********" + cardNumber.substring(12);
+    }
+
+
 }

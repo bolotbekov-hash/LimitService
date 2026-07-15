@@ -16,6 +16,7 @@ public class CustomerMapper {
         dto.setCustomerType(customer.getCustomerType());
         dto.setPhoneNumber(customer.getPhoneNumber());
         dto.setInn(customer.getInn());
+        dto.setEmail(customer.getEmail());
         return dto;
     }
 

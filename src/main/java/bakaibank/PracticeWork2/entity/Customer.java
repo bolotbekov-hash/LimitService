@@ -31,4 +31,7 @@ public class Customer {
 
     @Column(name = "inn")
     private String inn;
+
+    @Column(name = "email")
+    private String email;
 }

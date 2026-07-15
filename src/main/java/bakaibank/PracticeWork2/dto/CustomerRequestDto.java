@@ -26,4 +26,6 @@ public class CustomerRequestDto {
     @Size(min = 14, max = 14, message = "ИНН должен состоять ровно из 14 цифров")
     @Pattern(regexp = "^\\d{14}$", message = "ИНН должен содержать только цифры")
     private String inn;
+
+    private String email;
 }
