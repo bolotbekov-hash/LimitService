@@ -1,12 +1,18 @@
 package bakaibank.PracticeWork2.service;
 
+import bakaibank.PracticeWork2.dto.CardLimitResponseDto;
+import bakaibank.PracticeWork2.dto.LimitCheckResponseDto;
 import bakaibank.PracticeWork2.entity.Limit;
 import bakaibank.PracticeWork2.repository.LimitRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import javax.smartcardio.Card;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -39,4 +45,5 @@ public class LimitService {
     public List<Limit> getAllLimits() {
         return limitRepository.findAll();
     }
+
 }
